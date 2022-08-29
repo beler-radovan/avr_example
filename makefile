@@ -22,7 +22,7 @@ cflags+=-Wl,--gc-sections
 defs+=-DF_CPU=$(freq)
 
 # Includes
-inc+=/usr/avr/include/
+inc+=-I/usr/avr/include/
 
 oflags+=-O ihex
 oflags+=-R .eeprom
@@ -37,7 +37,7 @@ aflags+=-Uflash:w:$(output).ihex:i
 all: elf ihex
 
 elf: $(obj)
-	$(cc) $(cflags) $(defs) $^ -o $(output).elf
+	$(cc) $(cflags) $(defs) $(inc) $^ -o $(output).elf
 
 %.o: %.c
 	$(cc) $(cflags) $(defs) -c $< -o $@
@@ -49,7 +49,7 @@ up:
 	avrdude $(aflags)
 
 size:
-	avr-size -G $(output).elf
+	[[ -f $(output).elf ]] && avr-size -G $(output).elf || echo "$(output).elf doesn't exist"
 
 .PHONY: clean
 clean:
