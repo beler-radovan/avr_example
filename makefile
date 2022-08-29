@@ -48,6 +48,9 @@ ihex:
 up:
 	avrdude $(aflags)
 
+size:
+	avr-size -G $(output).elf
+
 .PHONY: clean
 clean:
 	rm -rf $(output).ihex $(output).elf $(obj)
