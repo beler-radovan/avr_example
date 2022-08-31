@@ -3,8 +3,14 @@ freq:=16000000L
 isp:=usbasp
 
 output:=example
-src:=$(output).c blink.c
-obj:=$(src:.c=.o)
+bin:=./bin/
+lib:=./lib/
+mkinc:=src/makefile.inc
+obj:=
+include $(mkinc)
+
+elffile:=$(bin)/$(output).elf
+ihexfile:=$(bin)/$(output).ihex
 
 # Compiler flags
 cc:=avr-gcc
@@ -25,10 +31,13 @@ cflags+=-Wl,--gc-sections,--print-gc-sections
 defs:=-DF_CPU=$(freq)
 
 # Includes
-inc:=-I/usr/avr/include/
+inc:=-I.
+inc+=-I/usr/avr/include/
 
 libs:=-L.
+libs+=-L$(lib)
 
+objcopy:=avr-objcopy
 oflags:=-O ihex
 oflags+=-R .eeprom
 
@@ -37,25 +46,26 @@ aflags:=-v
 aflags+=-p$(mcu)
 aflags+=-c$(isp)
 aflags+=-Pusb
-aflags+=-Uflash:w:$(output).ihex:i
+aflags+=-Uflash:w:$(ihexfile):i
 
 all: elf ihex
 
 elf: $(obj)
-	$(cc) $(cflags) $(defs) $(inc) $^ -o $(output).elf $(libs)
+	[[ -d $(bin) ]] || mkdir $(bin)
+	$(cc) $(cflags) $(defs) $(inc) $^ -o $(elffile) $(libs)
 
 %.o: %.c
 	$(cc) $(cflags) $(defs) -c $< -o $@
 
 ihex:
-	avr-objcopy $(oflags) $(output).elf $(output).ihex
+	$(objcopy) $(oflags) $(elffile) $(ihexfile)
 
 up:
-	avrdude $(aflags)
+	[[ -f $(ihexfile) ]] && avrdude $(aflags) || echo -e "\n$(ihexfile) doesn't exist"
 
 size:
-	[[ -f $(output).elf ]] && avr-size -G $(output).elf || echo "$(output).elf doesn't exist"
+	[[ -f $(elffile) ]] && avr-size -G $(elffile) || echo -e "\n$(elffile) doesn't exist"
 
 .PHONY: clean
 clean:
-	rm -rf $(output).ihex $(output).elf $(obj)
+	rm -rf $(obj) $(bin)
