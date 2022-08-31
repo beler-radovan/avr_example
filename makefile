@@ -9,20 +9,25 @@ obj=$(src:.c=.o)
 # Compiler flags
 cc=avr-gcc
 cflags+=-std=c11
-cflags+=-Wall -Werror
+cflags+=-Wall
+cflags+=-Werror
 cflags+=-Os
 cflags+=-mmcu=$(mcu)
 cflags+=-ffunction-sections -fdata-sections
-cflags+=-Wl,--gc-sections
+cflags+=-Wl,--gc-sections,--print-gc-sections
 # -Os -> optimize for size
-# -ffunction-sections -fdata-sections -> necessary for -Wl,--gc-sections
-# -Wl,--gc-sections -> tell linker to drop unused functions and data sections
+# -ffunction-sections -fdata-sections -> necessary for --gc-sections
+# -Wl -> linker options
+# --gc-sections -> tell linker to drop unused functions and data sections
+# --print-gc-sections -> print dropped sections
 
 # Macro definitions
 defs+=-DF_CPU=$(freq)
 
 # Includes
 inc+=-I/usr/avr/include/
+
+libs+=-L.
 
 oflags+=-O ihex
 oflags+=-R .eeprom
@@ -37,7 +42,7 @@ aflags+=-Uflash:w:$(output).ihex:i
 all: elf ihex
 
 elf: $(obj)
-	$(cc) $(cflags) $(defs) $(inc) $^ -o $(output).elf
+	$(cc) $(cflags) $(defs) $(inc) $^ -o $(output).elf $(libs)
 
 %.o: %.c
 	$(cc) $(cflags) $(defs) -c $< -o $@

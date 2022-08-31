@@ -6,7 +6,7 @@
 void blink() {
     DDRD = 1 << DD2; 
 
-    PORTD = 1 << PB2;
+    PORTD = 1 << PD2;
     _delay_ms(500);
     PORTD = 0;
     _delay_ms(200);
