@@ -1,14 +1,14 @@
-mcu=atmega328p
-freq=16000000L
-isp=usbasp
+mcu:=atmega328p
+freq:=16000000L
+isp:=usbasp
 
-output=example
-src=$(output).c blink.c
-obj=$(src:.c=.o)
+output:=example
+src:=$(output).c blink.c
+obj:=$(src:.c=.o)
 
 # Compiler flags
-cc=avr-gcc
-cflags+=-std=c11
+cc:=avr-gcc
+cflags:=-std=c11
 cflags+=-Wall
 cflags+=-Werror
 cflags+=-Os
@@ -22,18 +22,18 @@ cflags+=-Wl,--gc-sections,--print-gc-sections
 # --print-gc-sections -> print dropped sections
 
 # Macro definitions
-defs+=-DF_CPU=$(freq)
+defs:=-DF_CPU=$(freq)
 
 # Includes
-inc+=-I/usr/avr/include/
+inc:=-I/usr/avr/include/
 
-libs+=-L.
+libs:=-L.
 
-oflags+=-O ihex
+oflags:=-O ihex
 oflags+=-R .eeprom
 
 # Avrdude flags
-aflags+=-v
+aflags:=-v
 aflags+=-p$(mcu)
 aflags+=-c$(isp)
 aflags+=-Pusb
