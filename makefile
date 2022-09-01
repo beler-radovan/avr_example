@@ -17,6 +17,7 @@ cc:=avr-gcc
 cflags:=-std=c11
 cflags+=-Wall
 cflags+=-Werror
+# cflags+=-Wno-unused
 cflags+=-Os
 cflags+=-mmcu=$(mcu)
 cflags+=-ffunction-sections -fdata-sections
@@ -33,9 +34,11 @@ defs:=-DF_CPU=$(freq)
 # Includes
 inc:=-I.
 inc+=-I/usr/avr/include/
+inc+=-I$(lib)
 
 libs:=-L.
 libs+=-L$(lib)
+libs+=-lserial
 
 objcopy:=avr-objcopy
 oflags:=-O ihex
@@ -55,7 +58,7 @@ elf: $(obj)
 	$(cc) $(cflags) $(defs) $(inc) $^ -o $(elffile) $(libs)
 
 %.o: %.c
-	$(cc) $(cflags) $(defs) -c $< -o $@
+	$(cc) $(cflags) $(defs) $(inc) -c $< -o $@
 
 ihex:
 	$(objcopy) $(oflags) $(elffile) $(ihexfile)
